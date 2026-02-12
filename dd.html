@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Assessment Template</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      margin: 0 auto 20px;
+      padding: 40px 50px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    
+    .page-number {
+      position: absolute;
+      bottom: 30px;
+      right: 50px;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+    
+    h2 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 25px;
+      margin-top: 40px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+      font-size: 14px;
+    }
+    
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    .header-table {
+      margin-bottom: 40px;
+    }
+    
+    .header-table td {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      width: 20%;
+    }
+    
+    .header-table td:nth-child(even) {
+      background-color: white;
+      font-weight: normal;
+      width: 30%;
+    }
+    
+    .hazard-table th {
+      font-size: 13px;
+      padding: 10px;
+    }
+    
+    .hazard-table td {
+      height: 50px;
+      vertical-align: middle;
+    }
+    
+    .hazard-table .likelihood-cell,
+    .hazard-table .severity-cell,
+    .hazard-table .risk-cell {
+      text-align: center;
+      font-size: 13px;
+      font-weight: normal;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      user-select: none;
+    }
+    
+    .hazard-table .likelihood-cell:hover,
+    .hazard-table .severity-cell:hover,
+    .hazard-table .risk-cell:hover {
+      background-color: #e8f5e9;
+    }
+    
+
+    /* Hazard table selected cell coloring by value */
+    .hazard-table .selected-L {
+      background-color: #4caf50 !important; /* Green */
+      color: white !important;
+      font-weight: bold;
+    }
+    .hazard-table .selected-M {
+      background-color: #ffb300 !important; /* Amber */
+      color: white !important;
+      font-weight: bold;
+    }
+    .hazard-table .selected-H {
+      background-color: #e53935 !important; /* Red */
+      color: white !important;
+      font-weight: bold;
+    }
+    
+    .checkbox-group {
+      margin-bottom: 40px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+    
+    .checkbox-item label {
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+    .controls-table td:first-child {
+      width: 30%;
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    .risk-level-container {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 50px;
+      align-items: stretch;
+    }
+    
+    .risk-box {
+      flex: 1;
+      border: 2px solid #ddd;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 180px;
+      cursor: pointer;
+      transition: all 0.3s;
+      user-select: none;
+    }
+    
+    .risk-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .risk-box.active {
+      border-width: 3px;
+    }
+    
+    /* Specific colors for each risk level when active */
+    .risk-box[data-risk="very-low"].active {
+      border-color: #1b5e20; /* Dark green */
+    }
+    .risk-box[data-risk="very-low"].active .risk-icon {
+      background: #1b5e20 !important; /* Dark green */
+    }
+    
+    .risk-box[data-risk="low"].active {
+      border-color: #4caf50; /* Light green */
+    }
+    .risk-box[data-risk="low"].active .risk-icon {
+      background: #4caf50 !important; /* Light green */
+    }
+    
+    .risk-box[data-risk="medium"].active {
+      border-color: #ffb300; /* Amber */
+    }
+    .risk-box[data-risk="medium"].active .risk-icon {
+      background: #ffb300 !important; /* Amber */
+    }
+    
+    .risk-box[data-risk="high"].active {
+      border-color: #ff6f00; /* Orange-red */
+    }
+    .risk-box[data-risk="high"].active .risk-icon {
+      background: #ff6f00 !important; /* Orange-red */
+    }
+    
+    .risk-box[data-risk="very-high"].active {
+      border-color: #d32f2f; /* Red */
+    }
+    .risk-box[data-risk="very-high"].active .risk-icon {
+      background: #d32f2f !important; /* Red */
+    }
+    
+    .risk-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #ccc;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 auto 15px;
+    }
+    
+    .risk-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .risk-subtitle {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.4;
+    }
+    
+    .risk-box:not(.active) .risk-icon {
+      background: #ccc;
+    }
+    
+    .risk-box:not(.active) .risk-title {
+      color: #999;
+    }
+    
+    .action-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    .action-table td {
+      padding: 15px 12px;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    
+    .acknowledgement-table td {
+      height: 50px;
+      vertical-align: middle;
+    }
+    
+    .acknowledgement-table th {
+      background-color: #f0f0f0;
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      .page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Page 1: Header and Hazard Identification -->
+  <div class="page">
+    <h1>Risk Assessment</h1>
+    
+    <table class="header-table">
+      <tr>
+        <td>Activity</td>
+        <td contenteditable="true"></td>
+        <td>Ref</td>
+        <td contenteditable="true"></td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td colspan="3" contenteditable="true"></td>
+      </tr>
+      <tr>
+        <td>Assessor</td>
+        <td contenteditable="true"></td>
+        <td>Date</td>
+        <td contenteditable="true"></td>
+      </tr>
+    </table>
+    
+    <h2>Hazard Identification</h2>
+    
+    <table class="hazard-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Hazard</th>
+          <th colspan="3" style="width: 20%;">Likelihood</th>
+          <th colspan="3" style="width: 20%;">Severity</th>
+          <th colspan="3" style="width: 20%;">Risk</th>
+        </tr>
+        <tr>
+          <th></th>
+          <th class="likelihood-cell">L</th>
+          <th class="likelihood-cell">M</th>
+          <th class="likelihood-cell">H</th>
+          <th class="severity-cell">L</th>
+          <th class="severity-cell">M</th>
+          <th class="severity-cell">H</th>
+          <th class="risk-cell">L</th>
+          <th class="risk-cell">M</th>
+          <th class="risk-cell">H</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td class="likelihood-cell" data-value="L">L</td>
+          <td class="likelihood-cell" data-value="M">M</td>
+          <td class="likelihood-cell" data-value="H">H</td>
+          <td class="severity-cell" data-value="L">L</td>
+          <td class="severity-cell" data-value="M">M</td>
+          <td class="severity-cell" data-value="H">H</td>
+          <td class="risk-cell" data-value="L">L</td>
+          <td class="risk-cell" data-value="M">M</td>
+          <td class="risk-cell" data-value="H">H</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="page-number">Risk Assessment 1/4</div>
+  </div>
+  
+  <!-- Page 2: People at Risk and Controls -->
+  <div class="page">
+    <h2>People at Risk</h2>
+    
+    <div class="checkbox-group">
+      <div class="checkbox-item">
+        <input type="checkbox" id="workers">
+        <label for="workers">Workers</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="adjacent">
+        <label for="adjacent">Adjacent Workers</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="sitewide">
+        <label for="sitewide">Site Wide Workers</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="occupants">
+        <label for="occupants">Occupants</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="visitors">
+        <label for="visitors">Visitors</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="public">
+        <label for="public">Members of Public</label>
+      </div>
+    </div>
+    
+    <h2>Controls</h2>
+    
+    <table class="controls-table">
+      <thead>
+        <tr>
+          <th>Risk</th>
+          <th>Control Measures</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="page-number">Risk Assessment 2/4</div>
+  </div>
+  
+  <!-- Page 3: Risk Level and Further Action -->
+  <div class="page">
+    <h2>Risk Level</h2>
+    
+    <div class="risk-level-container">
+      <div class="risk-box active" data-risk="very-low">
+        <div class="risk-icon">&lt;L</div>
+        <div class="risk-title">Very Low</div>
+        <div class="risk-subtitle">safe to proceed work under standard control measures</div>
+      </div>
+      
+      <div class="risk-box" data-risk="low">
+        <div class="risk-icon">L</div>
+        <div class="risk-title">Low</div>
+        <div class="risk-subtitle">safe to proceed with work under additional control measures</div>
+      </div>
+      
+      <div class="risk-box" data-risk="medium">
+        <div class="risk-icon">M</div>
+        <div class="risk-title">Medium</div>
+        <div class="risk-subtitle">proceed with caution under additional controls measures</div>
+      </div>
+      
+      <div class="risk-box" data-risk="high">
+        <div class="risk-icon">H</div>
+        <div class="risk-title">High</div>
+        <div class="risk-subtitle">proceeds with caution under further controls with supervision</div>
+      </div>
+      
+      <div class="risk-box" data-risk="very-high">
+        <div class="risk-icon">!</div>
+        <div class="risk-title">Very High</div>
+        <div class="risk-subtitle">unsafe DO NOT proceed - essential further action needed</div>
+      </div>
+    </div>
+    
+    <h2>Further Action</h2>
+    
+    <table class="action-table">
+      <thead>
+        <tr>
+          <th style="width: 45%;">Action Required</th>
+          <th style="width: 25%;">Timeframe</th>
+          <th style="width: 15%;">By</th>
+          <th style="width: 15%;">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ensure adequate supervision is provided and that control measures remain valid for the duration of the works.</td>
+          <td>Ongoing</td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td>Safe systems of work are provided and issued to all staff and training provided in their use.</td>
+          <td>1 week<br>Refresh at inductions</td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td>All staff to be trained in the importance and use of correct Personal Protective Equipment and wearing of the correct PPE made a condition of employment.</td>
+          <td>1-week<br>Refresh at inductions</td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="page-number">Risk Assessment 3/4</div>
+  </div>
+  
+  <!-- Page 4: Acknowledgement -->
+  <div class="page">
+    <h2>Acknowledgement</h2>
+    
+    <table class="acknowledgement-table">
+      <thead>
+        <tr>
+          <th style="width: 33%;">Name</th>
+          <th style="width: 34%;">Signature</th>
+          <th style="width: 33%;">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="page-number">Risk Assessment 4/4</div>
+  </div>
+
+  <script>
+    // This script will be executed when the template is loaded
+    function initializeTemplate() {
+      console.log('Initializing Risk Assessment Template...');
+      
+      // Handle hazard table cell selection
+      const hazardTables = document.querySelectorAll('.hazard-table tbody');
+      
+      hazardTables.forEach(hazardTable => {
+        // Remove existing listeners to prevent duplicates
+        const newTable = hazardTable.cloneNode(true);
+        hazardTable.parentNode.replaceChild(newTable, hazardTable);
+        
+        newTable.addEventListener('click', function(e) {
+          const cell = e.target;
+          
+          // Check if clicked cell is a selectable cell
+          if (cell.classList.contains('likelihood-cell') || 
+              cell.classList.contains('severity-cell') || 
+              cell.classList.contains('risk-cell')) {
+            
+            // Get the row and determine the group (likelihood, severity, or risk)
+            const row = cell.parentElement;
+            let groupClass = '';
+            
+            if (cell.classList.contains('likelihood-cell')) {
+              groupClass = 'likelihood-cell';
+            } else if (cell.classList.contains('severity-cell')) {
+              groupClass = 'severity-cell';
+            } else if (cell.classList.contains('risk-cell')) {
+              groupClass = 'risk-cell';
+            }
+            
+            // Remove selected and value-specific classes from all cells in the same group in this row
+            const cellsInGroup = row.querySelectorAll('.' + groupClass);
+            cellsInGroup.forEach(c => {
+              c.classList.remove('selected-L', 'selected-M', 'selected-H', 'selected');
+            });
+
+            // Add value-specific selected class to clicked cell
+            const value = cell.getAttribute('data-value');
+            if (value === 'L') cell.classList.add('selected-L');
+            else if (value === 'M') cell.classList.add('selected-M');
+            else if (value === 'H') cell.classList.add('selected-H');
+            cell.classList.add('selected');
+
+            // Prevent contenteditable from interfering
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('Selected:', groupClass, value);
+          }
+        });
+      });
+      
+      // Handle risk level box selection
+      const riskBoxes = document.querySelectorAll('.risk-box');
+      
+      riskBoxes.forEach(box => {
+        // Clone to remove existing listeners
+        const newBox = box.cloneNode(true);
+        box.parentNode.replaceChild(newBox, box);
+      });
+      
+      // Re-select after cloning
+      const newRiskBoxes = document.querySelectorAll('.risk-box');
+      
+      newRiskBoxes.forEach(box => {
+        box.addEventListener('click', function(e) {
+          // Remove active class from all boxes
+          newRiskBoxes.forEach(b => b.classList.remove('active'));
+          
+          // Add active class to clicked box
+          this.classList.add('active');
+          
+          // Prevent contenteditable from interfering
+          e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('Selected risk level:', this.getAttribute('data-risk'));
+        });
+      });
+      
+      console.log('Risk Assessment Template initialized successfully!');
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeTemplate);
+    } else {
+      // DOM is already ready
+      initializeTemplate();
+    }
+    
+    // Also listen for custom template loaded event (for dynamic loading)
+    document.addEventListener('templateLoaded', function() {
+      console.log('Template loaded event received');
+      initializeTemplate();
+    });
+    
+    // Fallback: Initialize after a short delay to ensure everything is loaded
+    setTimeout(function() {
+      initializeTemplate();
+    }, 200);
+  </script>
+</body>
+</html>
