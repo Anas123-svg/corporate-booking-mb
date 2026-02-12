@@ -6,6 +6,7 @@ import Label from "@/components/form/Label";
 import ProfilePicUploader from "@/components/profilePicUploader";
 import Button from "@/components/ui/button/Button";
 import useAuthStore from "@/store/authStore";
+import { CorporateAdmin } from "@/types";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -34,13 +35,13 @@ interface PasswordState {
 export default function Profile() {
   const { user, token , setUser } = useAuthStore();
   // cast the store user to a Partial<Admin> so TypeScript knows these optional properties exist
-  const userData = user as unknown as Partial<Admin> | undefined;
+  const userData = user as unknown as Partial<CorporateAdmin> | undefined;
   const [admin, setAdmin] = useState<Admin>({
-    name: userData?.name || "",
+    name: userData?.firstname || "",
     email: userData?.email || "",
     phone: userData?.phone || "",
-    profileImage: userData?.profileImage || "",
-    verificationStatus: userData?.verificationStatus || 'PENDING',
+    profileImage: userData?.profile_image || "",
+    verificationStatus: userData?.kyb === 0 ? 'PENDING' : userData?.kyb === 1 ? 'VERIFIED' : 'REJECTED',
   });
 
   // Dummy state for KYB verification process
@@ -81,7 +82,7 @@ export default function Profile() {
     }
   }, []);
   const [validation, setValidation] = useState<ValidationState>({
-    name: userData?.name ? true : false,
+    name: userData?.firstname ? true : false,
     email: userData?.email ? true : false,
     phone: userData?.phone ? true : false,
     profileImage: true,
@@ -210,7 +211,12 @@ export default function Profile() {
       // Simulate API call delay
       await new Promise(res => setTimeout(res, 1000));
       // Simulate successful update with dummy data
-      setUser({ ...admin, id: (user as any)?.id });
+      setUser({
+        ...admin, id: (user as any)?.id,
+        firstname: "",
+        lastname: "",
+        username: ""
+      });
       toast.success("Profile updated successfully (demo mode)");
       setValidation({
         name: true,

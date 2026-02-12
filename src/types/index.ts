@@ -22,6 +22,7 @@ export type CorporateAdmin = {
   password: string;
   phone: string;
   profile_image: string;
+  kyb: 0 | 1;
 };
 
 export type ClientUser = {

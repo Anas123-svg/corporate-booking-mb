@@ -72,7 +72,7 @@ const Header = (props: {
           <div className="flex items-center gap-4">
             <span className="hidden text-right lg:block">
               <span className="block text-sm font-medium text-black dark:text-white">
-                {user?.name}
+                {user?.firstname} {user?.lastname}
               </span>
               <span className="block text-xs">{t("administrator")}</span>
             </span>
